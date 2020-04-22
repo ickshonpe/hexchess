@@ -1,2 +1,0 @@
-# Hexagonal Chess Variant
-
