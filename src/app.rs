@@ -1,6 +1,8 @@
 use ggez;
 use ggez::graphics;
+use ggez::graphics::Transform;
 use ggez::input::mouse;
+use ggez::mint::Point2;
 use crate::board;
 
 pub const TILE_SIZE: f32 = 30.0;
@@ -116,7 +118,7 @@ impl ggez::event::EventHandler for App {
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        graphics::clear(ctx, graphics::BLACK);
+        graphics::clear(ctx, graphics::Color::BLACK);
         
         
         let piece_sz = 32.0;
@@ -178,17 +180,16 @@ impl ggez::event::EventHandler for App {
         for hex in 0..board::HEX_COUNT {
             if let Some((player, piece)) = self.board.hexes[hex] {
                 let pos = self.board.positions[hex];
-                let dest = [BOARD_POS[0] - piece_sz / 2.5 + pos[0] * TILE_SIZE, BOARD_POS[1] - piece_sz / 2.5 + pos[1] * TILE_SIZE].into();
+                let dest: Point2<f32> = [BOARD_POS[0] - piece_sz / 2.5 + pos[0] * TILE_SIZE, BOARD_POS[1] - piece_sz / 2.5 + pos[1] * TILE_SIZE].into();
                 let symbol = ggez::graphics::Text::new((piece.code(), self.font, piece_sz));
                 let color = match player {
-                    board::Player::White => ggez::graphics::WHITE,
-                    board::Player::Black => ggez::graphics::BLACK
+                    board::Player::White => ggez::graphics::Color::WHITE,
+                    board::Player::Black => ggez::graphics::Color::BLACK
                 };
                 let params = ggez::graphics::DrawParam {
-                    dest,
                     color,
                     ..Default::default()
-                };
+                }.dest(dest);
                 ggez::graphics::draw(ctx, &symbol, params)?;
             }
         }
@@ -243,10 +244,14 @@ where F: Fn(usize) -> ggez::graphics::Color {
         let target = [dest[0] + pos[0] * tile_sz, dest[1] + pos[1] * tile_sz];
         let color = colouring(hex);
         let params = ggez::graphics::DrawParam {
-            dest: target.into(),
-            scale: [tile_sz - border, tile_sz - border].into(),
             color,
-            .. Default::default()
+            trans: Transform::Values {
+                dest: target.into(),
+                scale: [tile_sz - border, tile_sz - border].into(),
+                rotation: 0.0,
+                offset: [0.0, 0.0].into() 
+            },
+            ..Default::default()
         };
         graphics::draw(ctx,&hex_mesh, params)?;
     }

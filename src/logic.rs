@@ -250,7 +250,7 @@ pub fn get_bishop_moves(hexes: Hexes, hex: usize) -> Vec<usize> {
 
 pub fn get_fortress_moves(hexes: Hexes, hex: usize) -> Vec<usize> {
     let mut out = get_king_moves(hexes, hex);
-    if let Some((color, _)) = hexes[hex] {
+    if let Some((_color, _)) = hexes[hex] {
         for n in adjacent(hex) {
             if hexes[n].is_none() {
                 out.push(n);
